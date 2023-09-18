@@ -6,22 +6,6 @@ from datetime import datetime
 main_bp = Blueprint('main', __name__)
 # Định nghĩa route cho blueprint "main"
 
-
-@main_bp.route('/api/', methods=['GET'])
-def index():
-    data = {"name": "John Doe", "age": 32}
-    hrm = HRMCollection("employees")
-    new_id = hrm.add_data(data)
-    return jsonify(new_id)
-
-
-@main_bp.route('/api/get-employees', methods=['GET'])
-def getEmployees():
-    hrm = HRMCollection("employees")
-    data = hrm.get_all_data()
-    return jsonify(data)
-
-
 # Api lấy danh toàn bộ danh sách actors
 @main_bp.route('/api/get-actors', methods=['GET'])
 def getActor():
@@ -39,7 +23,6 @@ def getActorById():
     data = hrm.get_data_by_field('_id', idActor)[0]
     # dữ liệu phương thức get_data_by_field sẽ trả về dạng mảng
     return jsonify(data)
-
 
 
 # Api api thêm 1 actor
