@@ -29,31 +29,72 @@ class HRMCollection():
             print("Lỗi khi lấy dữ liệu:", str(e))
             return []
 
+    def get_data_by_field(self, field_name, field_value):
+        # Lấy dữ liệu từ collection dựa trên trường và giá trị truyền vào
+        try:
+            query = self.collection.order_by_child(
+                field_name).equal_to(field_value)
+            snapshot = query.get()
+            if snapshot is None:
+                return []
+            data = list(snapshot.values())
+            return data
+        except Exception as e:
+            print("Lỗi khi lấy dữ liệu:", str(e))
+            return []
+
     def add_data(self, data):
         # Thêm dữ liệu mới vào collection
         try:
             new_data = self.collection.push()
-            new_id = new_data.key
+            new_id = new_data.key.lstrip("-")
             data['_id'] = new_id
             new_data.set(data)
-            return data
+            return data, 200  # Trả về dữ liệu và mã trạng thái thành công
         except Exception as e:
             print("Lỗi khi thêm dữ liệu:", str(e))
-            return None
+            return None, 500  # Trả về None và mã trạng thái lỗi
 
     def update_data(self, data_id, new_data):
         # Cập nhật dữ liệu trong collection
         try:
-            data_ref = self.collection.child(data_id)
-            data_ref.set(new_data)
+            # Tìm kiếm dữ liệu theo trường _id trong collection
+            query = self.collection.order_by_child(
+                '_id').equal_to(data_id).get()
+
+            # Kiểm tra xem có dữ liệu tồn tại hay không
+            if query:
+                # Lấy khóa của dữ liệu tồn tại
+                existing_key = list(query.keys())[0]
+
+                # Thực hiện cập nhật dữ liệu
+                self.collection.child(existing_key).update(new_data)
+                return None
+
+            else:
+                print("Không tìm thấy dữ liệu với _id =", data_id)
         except Exception as e:
             print("Lỗi khi cập nhật dữ liệu:", str(e))
 
     def delete_data(self, data_id):
         # Xóa dữ liệu khỏi collection
         try:
-            data_ref = self.collection.child(data_id)
-            data_ref.delete()
+            print("data_id \n", data_id)
+            # Tìm kiếm dữ liệu theo trường _id trong collection
+            query = self.collection.order_by_child(
+                '_id').equal_to(data_id).get()
+
+            # Kiểm tra xem có dữ liệu tồn tại hay không
+            if query:
+                # Lấy khóa của dữ liệu tồn tại
+                existing_key = list(query.keys())[0]
+
+                # Thực hiện xóa dữ liệu
+                self.collection.child(existing_key).delete()
+
+                return None
+            else:
+                print("Không tìm thấy dữ liệu với _id =", data_id)
         except Exception as e:
             print("Lỗi khi xóa dữ liệu:", str(e))
 
