@@ -12,15 +12,11 @@ firebaseApp = firebase_admin.initialize_app(
     certificate, {"databaseURL": appsettings['databaseURL']})
 
 db = firestore.client()
-
-
 class FirestoreCollection():
-
     def __init__(self, collection_name):
         self.collection = db.collection(collection_name)
 
     def get_all_data(self):
-        """Return all documents in collection"""
         try:
             collections = self.collection.get()
             collections_dict = []
@@ -28,10 +24,14 @@ class FirestoreCollection():
             for doc in collections:
                 collections_dict.append(doc.to_dict())
             
-            return collections_dict
+             # Thêm thông báo thành công
+            response = {
+            'data': collections_dict,
+            'message': 'Lấy dữ liệu thành công'
+            }
+            return response
         except Exception as e:
-            print("Error getting collections:", e)
-            return []    
+            return {'message': f'Lỗi không xác định: {e}'} 
 
     def add_data(self, data):
         try:
@@ -54,10 +54,7 @@ class FirestoreCollection():
             return response
 
         except Exception as e:
-            print("Error adding document: ", e)
-            return {
-            'message': 'Lỗi khi thêm dữ liệu'  
-            }
+            return {'message': f'Lỗi không xác định: {e}'}
 
     def update_data(self, doc_id, updates):
         # Cập nhật dữ liệu trong collection
@@ -66,7 +63,11 @@ class FirestoreCollection():
 
             doc.update(updates)
 
-            return {'message': 'Cập nhật thành công'}
+            response = {
+            'data': True,
+            'message': 'Cập nhật dữ liệu thành công'
+            }
+            return response
 
         except ValueError as e:
             return {'message': str(e)}
@@ -74,47 +75,42 @@ class FirestoreCollection():
         except Exception as e:
             return {'message': f'Lỗi không xác định: {e}'}
 
-    # def delete_data(self, data_id):
-    #     # Xóa dữ liệu khỏi collection
-    #     try:
-    #         print("data_id \n", data_id)
-    #         # Tìm kiếm dữ liệu theo trường _id trong collection
-    #         query = self.collection.order_by_child(
-    #             '_id').equal_to(data_id).get()
-
-    #         # Kiểm tra xem có dữ liệu tồn tại hay không
-    #         if query:
-    #             # Lấy khóa của dữ liệu tồn tại
-    #             existing_key = list(query.keys())[0]
-
-    #             # Thực hiện xóa dữ liệu
-    #             self.collection.child(existing_key).delete()
-
-    #             return None
-    #         else:
-    #             print("Không tìm thấy dữ liệu với _id =", data_id)
-    #     except Exception as e:
-    #         print("Lỗi khi xóa dữ liệu:", str(e))
+    def delete_data(self, doc_id):
+        try:
+            # Kiểm tra đầu vào
+            if not doc_id:
+                raise ValueError("Vui lòng cung cấp id cần xóa")
+            # Tạo query theo id    
+            doc_ref = self.collection.document(doc_id)
+            # Xóa document
+            doc_ref.delete()
+            response = {
+            'data': True,
+            'message': 'Xóa dữ liệu thành công'
+            }
+            return response
+        except ValueError as err:
+            return {'message': str(err)}
+        except Exception as err:
+            return {'message': f'Lỗi không xác định: {err}'}
 
     def search_data(self, field, value):
+        # Hàm tìm kiếm dữ liệu theo trường và giá trị
         try:
-  
-            # Kiểm tra đầu vào 
-    
+             # Tạo query
             query = self.collection.order_by(field)
-            
-            # Truy vấn trực tiếp
-            results = query.document(value).get()  
-
+            # Truy vấn theo giá trị 
+            query = query.where(field, '==', value)
+            results = query.get()
             if not results:
-                return []
+              return []
+            data = [doc.to_dict() for doc in results]
 
-            data = []
-            for doc in results:
-                data.append(doc.to_dict())
-            
-            return data
-
+            response = {
+            'data': data,
+            'message': 'Tìm kiếm thành công'
+            }
+            return response
         except ValueError as err:
             return {'message': str(err)}
 
