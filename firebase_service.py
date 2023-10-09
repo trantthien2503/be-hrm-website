@@ -1,5 +1,5 @@
 import firebase_admin
-from firebase_admin import credentials, db, auth,firestore
+from firebase_admin import credentials, db, firestore
 
 import json
 
@@ -32,21 +32,6 @@ class FirestoreCollection():
         except Exception as e:
             print("Error getting collections:", e)
             return []    
-
-
-    # def get_data_by_field(self, field_name, field_value):
-    #     # Lấy dữ liệu từ collection dựa trên trường và giá trị truyền vào
-    #     try:
-    #         query = self.collection.order_by_child(
-    #             field_name).equal_to(field_value)
-    #         snapshot = query.get()
-    #         if snapshot is None:
-    #             return []
-    #         data = list(snapshot.values())
-    #         return data
-    #     except Exception as e:
-    #         print("Lỗi khi lấy dữ liệu:", str(e))
-    #         return []
 
     def add_data(self, data):
         try:
