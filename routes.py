@@ -38,6 +38,22 @@ def update_staffById():
         return jsonify(update)
     else:
         return jsonify({'message': 'Thiếu id dữ liệu'})
+    
+
+# Api tìm staffinfo theo trường {field, value}
+@main_bp.route('/api/search-staffinfo-by-field', methods=['POST'])
+def search_staffinfoByFields():
+    req = request.get_json() # Tạo đối tượng Staffinfo từ dữ liệu nhận được
+    if req:
+        field = req.get('field')
+        value = req.get('value')
+
+        firestore = FirestoreCollection("staffinfos")# Khởi tạo đối tượng giao tiếp với collection staffinfos trong Firestore
+        search = firestore.search_data(field, value)
+        return jsonify(search)
+    else:
+        return jsonify({'message': 'Thiếu id dữ liệu'})
+
 
  
 

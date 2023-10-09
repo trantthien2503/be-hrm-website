@@ -96,59 +96,27 @@ class FirestoreCollection():
     #     except Exception as e:
     #         print("Lỗi khi xóa dữ liệu:", str(e))
 
-    # def search_data(self, field, value):
-    #     # Tìm kiếm dữ liệu trong collection dựa trên trường và giá trị
-    #     try:
-    #         query = self.collection.order_by_child(field).equal_to(value)
-    #         result = query.get()
-    #         if result is None:
-    #             return []
-    #         data = list(result.values())
-    #         return data
-    #     except Exception as e:
-    #         print("Lỗi khi tìm kiếm dữ liệu:", str(e))
-    #         return []
+    def search_data(self, field, value):
+        try:
+  
+            # Kiểm tra đầu vào 
+    
+            query = self.collection.order_by(field)
+            
+            # Truy vấn trực tiếp
+            results = query.document(value).get()  
 
-    # def create_user(self, email, password):
-    #     # Tạo người dùng mới với email và mật khẩu.
-    #     # Trả về thông tin người dùng được tạo thành công hoặc None nếu có lỗi.
-    #     try:
-    #         user = auth.create_user(
-    #             email=email,
-    #             password=password
-    #         )
-    #         return user
-    #     except Exception as e:
-    #         print("Lỗi khi tạo người dùng:", str(e))
-    #         return None
+            if not results:
+                return []
 
-    # def delete_user(self, user_id):
-    #     # Xóa người dùng dựa trên user_id.
-    #     try:
-    #         auth.delete_user(user_id)
-    #     except Exception as e:
-    #         print("Lỗi khi xóa người dùng:", str(e))
+            data = []
+            for doc in results:
+                data.append(doc.to_dict())
+            
+            return data
 
-    # def get_user(self, user_id):
-    #     # Lấy thông tin người dùng dựa trên user_id.
-    #     # Trả về thông tin người dùng hoặc None nếu không tìm thấy người dùng.
-    #     try:
-    #         user = auth.get_user(user_id)
-    #         return user
-    #     except Exception as e:
-    #         print("Lỗi khi lấy thông tin người dùng:", str(e))
-    #         return None
+        except ValueError as err:
+            return {'message': str(err)}
 
-    # def update_user(self, user_id, display_name=None, password=None):
-    #     # Cập nhật thông tin người dùng dựa trên user_id.
-    #     # Trả về thông tin người dùng sau khi cập nhật hoặc None nếu có lỗi.
-    #     try:
-    #         user = auth.update_user(
-    #             user_id,
-    #             display_name=display_name,
-    #             password=password
-    #         )
-    #         return user
-    #     except Exception as e:
-    #         print("Lỗi khi cập nhật người dùng:", str(e))
-    #         return None
+        except Exception as err:
+            return {'message': f'Lỗi không xác định: {err}'}
