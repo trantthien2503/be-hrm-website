@@ -35,30 +35,44 @@ class FirestoreCollection():
 
     def add_data(self, data):
         try:
-            # Tạo document mới 
-            doc_ref = self.collection.document()  
+            # Lấy id và thêm vào data
+            doc_ref = self.collection.document()
+            id = doc_ref.id
+            data['id'] = id
+            
             doc_ref.set(data)
 
             doc = doc_ref.get()
             doc_data = doc.to_dict()
 
-            return doc_data
+            # Thêm thông báo thành công
+            response = {
+            'data': doc_data,
+            'message': 'Thêm dữ liệu thành công'
+            }
+
+            return response
 
         except Exception as e:
             print("Error adding document: ", e)
-            return None
+            return {
+            'message': 'Lỗi khi thêm dữ liệu'  
+            }
 
     def update_data(self, doc_id, updates):
         # Cập nhật dữ liệu trong collection
-        try:
-            # Lấy document theo id
+        try:    
             doc = self.collection.document(doc_id)
-            
-            # Cập nhật dữ liệu
+
             doc.update(updates)
 
+            return {'message': 'Cập nhật thành công'}
+
+        except ValueError as e:
+            return {'message': str(e)}
+
         except Exception as e:
-            print("Error updating document: ", e)
+            return {'message': f'Lỗi không xác định: {e}'}
 
     # def delete_data(self, data_id):
     #     # Xóa dữ liệu khỏi collection
