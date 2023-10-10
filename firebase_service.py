@@ -116,3 +116,57 @@ class FirestoreCollection():
 
         except Exception as err:
             return {'message': f'Lỗi không xác định: {err}'}
+
+
+    def registerUser(self, data):
+        # Chỉ check trường hợp email đã tồn tại
+        try:
+            # Validate data
+            email = data['email']
+            search = self.search_data('email',email)
+            if search:
+                return {
+                    "data": False,
+                    'message': 'Email đã được đăng ký'  
+                }
+            doc_ref = self.collection.document(email).set(data)
+
+            doc_ref = self.collection.document(email)
+            doc = doc_ref.get()
+
+            response = {
+                "user": doc.to_dict(),
+                "message": "Đăng ký thành công"
+            }
+            return response
+        except Exception as err:
+            return {'message': f'Lỗi: {err}'}
+        
+
+    def loginUser(self, data):
+
+        try:
+        
+            # Validate data
+            email = data['email']
+            password = data['password']
+
+            # Query document
+            query = self.collection.where('email', '==', email).where('password', '==', password)
+            doc = query.get() 
+            
+            if not doc:
+                return {'message': 'Email hoặc mật khẩu không chính xác'}
+
+            # Get user data
+            user = doc[0].to_dict()
+
+            response = {
+            "user": user,  
+            'message': 'Đăng nhập thành công'
+            }
+
+            return response
+
+        except Exception as err:
+            return {'message': f'Lỗi: {err}'}
