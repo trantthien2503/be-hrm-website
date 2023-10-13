@@ -56,6 +56,20 @@ class FirestoreCollection():
         except Exception as e:
             return {'message': f'Lỗi không xác định: {e}'}
 
+    def add_multiple_data(self, data):
+        try:
+            response = []
+            
+            for item in data:
+                self.add_data(item)
+
+            return {
+                "data": True,
+                "message": "Thêm nhiều dữ liệu thành công"
+            }
+        except Exception as e:
+                return {'message': f'Lỗi không xác định: {e}'}
+
     def update_data(self, doc_id, updates):
         # Cập nhật dữ liệu trong collection
         try:    

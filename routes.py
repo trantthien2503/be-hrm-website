@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify, request
 from firebase_service import FirestoreCollection
 from model.staffinfo import Staffinfo
 from model.user import User
-
+import json
+import ast
 # Tạo blueprint với tên là "main"
 main_bp = Blueprint('main', __name__)
 # Định nghĩa route cho blueprint "main"
@@ -56,6 +57,21 @@ def add_staffInfo():
     firestore = FirestoreCollection("staffinfos")# Khởi tạo đối tượng giao tiếp với collection staffinfos trong Firestore
     newData = firestore.add_data(staff_dict) # Thêm dữ liệu vào Firestore
     return jsonify(newData)
+
+
+# Api thêm nhiều staffinfo 
+@main_bp.route('/api/staffinfos/add-multiple', methods=['POST'])
+def add_multiple_staffInfo():
+  req = request.get_json()
+  data = req.get('data')
+  data_list = eval(data)
+  if data:
+    firestore = FirestoreCollection("staffinfos")
+    response = firestore.add_multiple_data(data_list)
+    return jsonify(response)
+  else:
+    return jsonify({'message': 'Thiếu dữ liệu'})
+  
 
 # Api cập nhật staffinfo bất kỳ
 @main_bp.route('/api/staffinfos/update-by-fields', methods=['POST'])
