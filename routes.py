@@ -64,10 +64,9 @@ def add_staffInfo():
 def add_multiple_staffInfo():
   req = request.get_json()
   data = req.get('data')
-  data_list = eval(data)
   if data:
     firestore = FirestoreCollection("staffinfos")
-    response = firestore.add_multiple_data(data_list)
+    response = firestore.add_multiple_data(data)
     return jsonify(response)
   else:
     return jsonify({'message': 'Thiếu dữ liệu'})
