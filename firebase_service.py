@@ -58,8 +58,6 @@ class FirestoreCollection():
 
     def add_multiple_data(self, data):
         try:
-            response = []
-            
             for item in data:
                 self.add_data(item)
 
